@@ -1,6 +1,7 @@
 .idea
 target/
 .project
+.gradle
 .classpath
 .settings/
 *.iml
