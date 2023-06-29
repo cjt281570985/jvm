@@ -3,17 +3,35 @@ package jvm.bytecode;
 /**
  * @Author: jimmy
  * @Description:
- * @Date: Created 2023-06-13 上午10:49
+ * @Date: Created 2023-06-21 上午10:49
  */
-public class MyTest1 {
+public class MyTest2 {
 
-  private int a = 1;
+  String str = "Welcome";
 
-  public int getA() {
-    return a;
+  private int x = 5;
+
+  public static Integer in = 10;
+
+  public static void main(String[] args) {
+    MyTest2 myTest2 = new MyTest2();
+
+    myTest2.setX(8);
+
+    in = 20;
   }
 
-  public void setA(int a) {
-    this.a = a;
+  private synchronized void setX(int x) {
+    this.x = x;
+  }
+
+  private void test(String str) {
+    synchronized (str) {
+      System.out.println("hello world");
+    }
+  }
+
+  private synchronized static void test2() {
+
   }
 }

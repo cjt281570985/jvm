@@ -48,7 +48,7 @@ public class MyTest17 extends ClassLoader{
 
     System.out.println("loadClassData..........");
     try {
-      className = className.replace(".", "\\");
+      className = className.replace(".", "/");
       String fileName = this.path + className + this.feleExtension;
       System.out.println("fileName: " + fileName);
       is = new FileInputStream(new File(fileName));
@@ -74,22 +74,25 @@ public class MyTest17 extends ClassLoader{
 
   public static void main(String[] args) throws Exception {
 
-    MyTest17 myTest = new MyTest17("loader17");
+    MyTest17 loader1 = new MyTest17("loader17");
     //myTest.setPath("E:\\gitSpace\\jdk8\\out\\production\\classes\\");
-    myTest.setPath("c:\\");
+    //   /Users/jimmy/code/gitSpace/jvm/out/production/classes
+    //myTest.setPath("/Users/jimmy/code/gitSpace/jvm/out/production/classes/");
+    loader1.setPath("/Users/jimmy/data/tmp/mytest19/");
 
-    Class<?> clazz = myTest.loadClass("jvm.classloader.MyTest2");
+    Class<?> clazz = loader1.loadClass("jvm.classloader.MyTest2"); //classpath目录下的MyTest2.class要删除
     System.out.println("class: " + clazz);
     System.out.println("class.hashCode: " + clazz.hashCode());
     Object object = clazz.newInstance();
     System.out.println(object);
     System.out.println("--------------------------------");
 
-    MyTest17 myTest2 = new MyTest17("loader177");
-    //myTest.setPath("E:\\gitSpace\\jdk8\\out\\production\\classes\\");
-    myTest2.setPath("c:\\");
+    //MyTest17 loader2 = new MyTest17("loader177");
+    MyTest17 loader2 = new MyTest17(loader1 , "loader177");
+    //myTest.setPath("/Users/jimmy/code/gitSpace/jvm/out/production/classes/");
+    loader2.setPath("/Users/jimmy/data/tmp/");
 
-    Class<?> clazz2 = myTest2.loadClass("jvm.classloader.MyTest2");
+    Class<?> clazz2 = loader2.loadClass("jvm.classloader.MyTest2");
     System.out.println("class2: " + clazz2);
     System.out.println("class2.hashCode: " + clazz2.hashCode());
     Object object2 = clazz2.newInstance();

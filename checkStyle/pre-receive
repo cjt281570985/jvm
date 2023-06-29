@@ -1,0 +1,68 @@
+#!/bin/sh
+ 
+`git config checkstyle.checkfile http://182.254.158.159/share/checkStyle/raw/master/check-style.xml`
+`git config checkstyle.jar /var/opt/gitlab/checkStyle/checkstyle-8.9-all.jar`
+
+checkstyle_jar=`git config --get checkstyle.jar`
+checkstyle_file=`git config --get checkstyle.checkfile`
+ 
+if [ -z "$checkstyle_jar" ]; then
+   echo "checkstyle_jar not defined."
+   echo "Configure server repository using \"git config  checkstyle.jar <jar file location>"
+   exit 1
+fi
+
+if [ -z "$checkstyle_file" ]; then
+   echo "checkstyle_file not defined."
+   echo "Configure server repository using \"git config checkstyle.file <check file location>"
+   exit 1
+fi
+ 
+REJECT=0
+
+
+# checkstyle_cmd=`java -jar ${checkstyle_jar} -c ${checkstyle_file}`
+checkstyle_cmd="java -jar ${checkstyle_jar} -c ${checkstyle_file}"
+ 
+while read oldrev newrev refname; do
+ 
+    if [ "$oldrev" == "0000000000000000000000000000000000000000" ];then
+        oldrev="${newrev}^"
+    fi
+    
+    files=`git diff --diff-filter=d --name-only ${oldrev} ${newrev}  | grep -e "\.java$"`
+    
+    if [ -n "$files" ]; then
+        TEMPDIR=`mktemp -d`
+        for file in ${files}; do
+            mkdir -p "${TEMPDIR}/`dirname ${file}`" &>/dev/null
+            git show $newrev:$file > ${TEMPDIR}/${file} 
+        done;
+    
+        files_to_check=`find $TEMPDIR -name '*.java'`
+           
+        CHECKS=`${checkstyle_cmd} ${files_to_check} | sed 's/\\\\/\//g' | sed '1d;$d' | sed -e "s#${TEMPDIR}/##g" | sed 's/\(:[0-9]\+\)\+:\?.*//' | sort | uniq -c;exit ${PIPESTATUS[0]}`
+        
+        # CHECKS=`${checkstyle_cmd} ${files_to_check} `
+
+        CHECKS_EXIT=$?
+
+        if [ ${CHECKS_EXIT} -ne 0 ] ; then
+
+            echo ${CHECKS}
+            # echo -e "${checkstyle_cmd} [files]"
+            exit ${CHECKS_EXIT}
+        fi
+        if [ -n "$CHECKS" ]; then 
+            echo -e "CHECKSTYLE ISSUES DETECTED -- REJECTED [$refname]"
+            echo -e "$CHECKS" | while read num check; do
+                 printf '  ' $num
+                 echo -e "$check"
+            done
+            REJECT=1
+        fi
+        rm -rf $TEMPDIR
+    fi    
+done
+ 
+exit $REJECT

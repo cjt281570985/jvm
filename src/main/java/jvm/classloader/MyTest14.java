@@ -15,11 +15,14 @@ public class MyTest14 {
   public static void main(String[] args) throws IOException {
 
     ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+    System.out.println(classLoader);
     String resourceName = "jvm/classloader/MyTest12.class";
     Enumeration<URL> urls = classLoader.getResources(resourceName);
     while (urls.hasMoreElements()) {
       URL url = urls.nextElement();
-      System.out.println(url); // file:/E:/gitSpace/jdk8/out/production/classes/jvm/classloader/MyTest12.class
+      // file:/Users/jimmy/code/gitSpace/jvm/out/production/classes/jvm/classloader/MyTest12.class
+      // file:/E:/gitSpace/jdk8/out/production/classes/jvm/classloader/MyTest12.class
+      System.out.println(url);
     }
     System.out.println("--------------------------------");
 
